@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import "dotenv/config";
 
 const app = express();
@@ -41,6 +41,21 @@ app.get("/users", async (req, res) => {
 app.post("/jobs", async (req, res) => {
   const job = req.body;
   const result = await jobsCollection.insertOne(job);
+  res.send(result);
+});
+
+app.get("/jobs", async (req, res) => {
+  const cursor = jobsCollection.find({});
+  const jobs = await cursor.toArray();
+  res.send(jobs);
+});
+
+app.delete("/jobs/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log("Deleting job with ID:", id);
+  const query = { _id: new ObjectId(id) };
+  console.log("Query for deletion:", query);
+  const result = await jobsCollection.deleteOne(query);
   res.send(result);
 });
 
